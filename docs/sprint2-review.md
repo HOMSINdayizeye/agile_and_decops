@@ -13,9 +13,9 @@ Sprint 1 retrospective improvements.
 | T-7 | Metrics endpoint            | Done   | `GET /metrics` returns `requests_total`, `requests_by_status`, `tasks_total` |
 
 **Retro improvements applied (from Sprint 1)**
-1. ✅ Centralised structured logging → `app/logging_config.py` (request middleware).
-2. ✅ Global error handler with tracked `error_id` → `app/errors.py`.
-3. ✅ Thin endpoints + service/store layer + `/metrics` → `app/store.py`, `app/metrics.py`.
+1.  Centralised structured logging → `app/logging_config.py` (request middleware).
+2.  Global error handler with tracked `error_id` → `app/errors.py`.
+3.  Thin endpoints + service/store layer + `/metrics` → `app/store.py`, `app/metrics.py`.
 
 **Demo (curl)**
 
