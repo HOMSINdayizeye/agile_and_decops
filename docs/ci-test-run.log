@@ -1,0 +1,15 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.3.3, pluggy-1.6.0 -- C:\Users\Amalitech\AppData\Local\Programs\Python\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Amalitech\Desktop\agile_and devops
+plugins: anyio-4.14.1
+collecting ... collected 6 items
+
+tests/test_create_task.py::test_health_returns_ok PASSED                 [ 16%]
+tests/test_create_task.py::test_create_task_returns_201_and_task PASSED  [ 33%]
+tests/test_create_task.py::test_create_task_rejects_empty_title PASSED   [ 50%]
+tests/test_list_tasks.py::test_list_tasks_is_empty_initially PASSED      [ 66%]
+tests/test_list_tasks.py::test_list_tasks_reflects_created_tasks PASSED  [ 83%]
+tests/test_list_tasks.py::test_list_tasks_returns_array_of_objects PASSED [100%]
+
+============================== 6 passed in 0.04s ==============================
