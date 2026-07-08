@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from app import store
 from app.errors import register_error_handlers
 from app.logging_config import configure_logging, request_logging_middleware
+from app import metrics
 
 __version__ = "0.2.0"
 
@@ -35,6 +36,10 @@ def create_app() -> Flask:
     @app.get("/tasks")
     def list_tasks():
         return jsonify(store.list_tasks()), 200
+
+    @app.get("/metrics")
+    def get_metrics():
+        return jsonify(metrics.snapshot(len(store.list_tasks()))), 200
 
     return app
 

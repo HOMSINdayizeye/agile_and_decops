@@ -7,6 +7,8 @@ called out in the Sprint 1 retrospective.
 import logging
 import time
 
+from app import metrics
+
 LOGGER_NAME = "taskflow"
 
 
@@ -52,4 +54,5 @@ def request_logging_middleware(app) -> None:
             response.status_code,
             duration_ms,
         )
+        metrics.record_request(response.status_code)
         return response
