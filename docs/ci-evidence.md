@@ -22,14 +22,24 @@ The CI job executes exactly this command locally. Output captured at
 
 ```
 $ python -m pytest -v
-tests/test_create_task.py::test_health_returns_ok PASSED                 [ 16%]
-tests/test_create_task.py::test_create_task_returns_201_and_task PASSED  [ 33%]
-tests/test_create_task.py::test_create_task_rejects_empty_title PASSED   [ 50%]
-tests/test_list_tasks.py::test_list_tasks_is_empty_initially PASSED      [ 66%]
-tests/test_list_tasks.py::test_list_tasks_reflects_created_tasks PASSED  [ 83%]
-tests/test_list_tasks.py::test_list_tasks_returns_array_of_objects PASSED[100%]
+tests/test_create_task.py::test_health_returns_ok PASSED                 [  6%]
+tests/test_create_task.py::test_create_task_returns_201_and_task PASSED  [ 13%]
+tests/test_create_task.py::test_create_task_rejects_empty_title PASSED   [ 20%]
+tests/test_list_tasks.py::test_list_tasks_is_empty_initially PASSED      [ 26%]
+tests/test_list_tasks.py::test_list_tasks_reflects_created_tasks PASSED  [ 33%]
+tests/test_list_tasks.py::test_list_tasks_returns_array_of_objects PASSED[ 40%]
+tests/test_observability.py::test_404_returns_json_error PASSED          [ 46%]
+tests/test_observability.py::test_internal_error_is_tracked_with_error_id PASSED [ 53%]
+tests/test_observability.py::test_request_is_logged PASSED              [ 60%]
+tests/test_metrics.py::test_metrics_reports_task_and_request_counts PASSED [ 66%]
+tests/test_crud.py::test_update_changes_title_and_status PASSED          [ 73%]
+tests/test_crud.py::test_update_rejects_empty_title PASSED              [ 80%]
+tests/test_crud.py::test_update_returns_404_for_missing PASSED          [ 86%]
+tests/test_crud.py::test_delete_removes_task PASSED                      [ 93%]
+tests/test_crud.py::test_delete_returns_404_for_missing PASSED          [100%]
 
-============================== 6 passed in 0.04s ==============================
+============================= 15 passed in 0.14s ==============================
 ```
 
-**Result:** pipeline would pass (all tests green).
+**Result:** pipeline is green across both sprints (15 tests passing). The same
+command runs automatically in `.github/workflows/ci.yml` on every push/PR.
