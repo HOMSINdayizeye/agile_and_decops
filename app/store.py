@@ -30,6 +30,28 @@ def get_task(task_id: int):
         return dict(task) if task else None
 
 
+def update_task(task_id: int, title: str | None = None, status: str | None = None):
+    with _lock:
+        task = _tasks.get(task_id)
+        if task is None:
+            return None
+        if title is not None:
+            task["title"] = title
+        if status is not None:
+            task["status"] = status
+        return dict(task)
+
+
+def delete_task(task_id: int) -> bool:
+    with _lock:
+        return _tasks.pop(task_id, None) is not None
+
+
+def count() -> int:
+    with _lock:
+        return len(_tasks)
+
+
 def reset_store() -> None:
     with _lock:
         _tasks.clear()

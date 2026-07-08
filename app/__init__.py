@@ -39,7 +39,27 @@ def create_app() -> Flask:
 
     @app.get("/metrics")
     def get_metrics():
-        return jsonify(metrics.snapshot(len(store.list_tasks()))), 200
+        return jsonify(metrics.snapshot(store.count())), 200
+
+    @app.patch("/tasks/<int:task_id>")
+    def update_task(task_id):
+        body = request.get_json(silent=True) or {}
+        title = body.get("title")
+        status = body.get("status")
+        if title is not None:
+            title = str(title).strip()
+            if not title:
+                return jsonify(error="title must not be empty"), 400
+        updated = store.update_task(task_id, title=title, status=status)
+        if updated is None:
+            return jsonify(error="task not found"), 404
+        return jsonify(updated), 200
+
+    @app.delete("/tasks/<int:task_id>")
+    def delete_task(task_id):
+        if not store.delete_task(task_id):
+            return jsonify(error="task not found"), 404
+        return "", 204
 
     return app
 
