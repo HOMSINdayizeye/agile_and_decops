@@ -1,17 +1,23 @@
-"""TaskFlow API — Sprint 1 scaffold.
+"""TaskFlow API — Sprint 2.
 
-Minimal Flask application exposing a health endpoint.
-Endpoints for tasks are added in later iterations.
+Adds observability (structured request logging + global error tracking) on top
+of the Sprint 1 MVP, then the remaining CRUD + metrics endpoints.
 """
 from flask import Flask, jsonify, request
 
 from app import store
+from app.errors import register_error_handlers
+from app.logging_config import configure_logging, request_logging_middleware
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 def create_app() -> Flask:
+    configure_logging()
     app = Flask(__name__)
+
+    request_logging_middleware(app)
+    register_error_handlers(app)
 
     @app.get("/health")
     def health():
