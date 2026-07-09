@@ -1,4 +1,8 @@
-# CI/CD Evidence — Sprint 1
+# CI/CD Evidence
+
+> Stack: **FastAPI** (migrated from Flask). Pipeline definition and commands
+> below are unchanged — `pytest` runs the same 15 tests against the ASGI app via
+> FastAPI's `TestClient`.
 
 ## Pipeline definition
 Workflow file: `.github/workflows/ci.yml`

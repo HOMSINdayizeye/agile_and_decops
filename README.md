@@ -1,14 +1,14 @@
 # TaskFlow — a tiny task-management REST API
 
-TaskFlow is a small Flask service demonstrating Agile + DevOps practices across
-two simulated sprints. It supports creating, listing, updating, and deleting
-tasks, plus health, metrics, structured logging, and error tracking.
+TaskFlow is a small **FastAPI** service demonstrating Agile + DevOps practices
+across two simulated sprints. It supports creating, listing, updating, and
+deleting tasks, plus health, metrics, structured logging, and error tracking.
 
 ## Run locally
 
 ```bash
 python -m pip install -r requirements.txt
-python -m app            # serves http://localhost:5000
+python -m app            # uvicorn serves http://localhost:5000
 ```
 
 ## Test
