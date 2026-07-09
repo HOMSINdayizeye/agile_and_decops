@@ -8,18 +8,17 @@ deleting tasks, plus health, metrics, structured logging, and error tracking.
 
 ```bash
 python -m pip install -r requirements.txt
-python -m app            # starts uvicorn on http://127.0.0.1:5000
+python -m app
 ```
 
-Then open one of these in your browser (do **not** use `0.0.0.0` — it is a
-bind address, not a URL):
+The server starts on **http://127.0.0.1:5000** (this is the address to open).
+Then browse:
 
 - http://127.0.0.1:5000/health
 - http://localhost:5000/health   (Swagger UI is at http://localhost:5000/docs)
 
-> The server prints `running on http://0.0.0.0:5000`, which means it listens on
-> **all** network interfaces. To actually browse it, use `127.0.0.1` or
-> `localhost`.
+> Do **not** use `0.0.0.0` in the browser — it is a bind address, not a URL,
+> and browsers reject it with `ERR_ADDRESS_INVALID`.
 
 ## Test
 
