@@ -2,14 +2,14 @@ from app import create_app, store
 
 
 def _create(client, title="Task"):
-    return client.post("/tasks", json={"title": title}).get_json()["id"]
+    return client.post("/tasks", json={"title": title}).json()["id"]
 
 
 def test_update_changes_title_and_status(client):
     task_id = _create(client)
     res = client.patch(f"/tasks/{task_id}", json={"title": "Renamed", "status": "done"})
     assert res.status_code == 200
-    body = res.get_json()
+    body = res.json()
     assert body["title"] == "Renamed"
     assert body["status"] == "done"
 
@@ -29,8 +29,7 @@ def test_delete_removes_task(client):
     task_id = _create(client)
     res = client.delete(f"/tasks/{task_id}")
     assert res.status_code == 204
-    assert client.get(f"/tasks/{task_id}").status_code == 404 or True
-    assert all(t["id"] != task_id for t in client.get("/tasks").get_json())
+    assert all(t["id"] != task_id for t in client.get("/tasks").json())
 
 
 def test_delete_returns_404_for_missing(client):

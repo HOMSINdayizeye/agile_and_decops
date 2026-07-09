@@ -6,13 +6,13 @@ from app import create_app
 def test_404_returns_json_error(client):
     res = client.get("/does-not-exist")
     assert res.status_code == 404
-    assert res.get_json()["error"] == "not found"
+    assert res.json()["error"] == "not found"
 
 
 def test_internal_error_is_tracked_with_error_id(client, caplog):
     # Force an unhandled exception through a temporary route to exercise the
     # global 500 handler and confirm it returns a trackable error_id.
-    app = client.application
+    app = client.app
 
     @app.get("/boom")
     def boom():
@@ -23,7 +23,7 @@ def test_internal_error_is_tracked_with_error_id(client, caplog):
     res = client.get("/boom")
 
     assert res.status_code == 500
-    body = res.get_json()
+    body = res.json()
     assert body["error"] == "internal server error"
     assert "error_id" in body and len(body["error_id"]) == 12
     assert any(

@@ -1,64 +1,56 @@
-"""TaskFlow API — Sprint 2.
-
-Adds observability (structured request logging + global error tracking) on top
-of the Sprint 1 MVP, then the remaining CRUD + metrics endpoints.
-"""
-from flask import Flask, jsonify, request
+"""TaskFlow API — FastAPI implementation (migrated from Flask in Sprint 2)."""
+from fastapi import FastAPI, HTTPException, status
 
 from app import store
-from app.errors import register_error_handlers
-from app.logging_config import configure_logging, request_logging_middleware
 from app import metrics
+from app.models import Task, TaskCreate, TaskUpdate
+from app.errors import register_exception_handlers
+from app.logging_config import configure_logging, LoggingMiddleware
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
-def create_app() -> Flask:
+def create_app() -> FastAPI:
     configure_logging()
-    app = Flask(__name__)
-
-    request_logging_middleware(app)
-    register_error_handlers(app)
+    app = FastAPI(title="TaskFlow", version=__version__)
+    app.add_middleware(LoggingMiddleware)
+    register_exception_handlers(app)
 
     @app.get("/health")
     def health():
-        return jsonify(status="ok", version=__version__), 200
+        return {"status": "ok", "version": __version__}
 
-    @app.post("/tasks")
-    def create_task():
-        body = request.get_json(silent=True) or {}
-        title = (body.get("title") or "").strip()
+    @app.post("/tasks", response_model=Task, status_code=status.HTTP_201_CREATED)
+    def create_task(payload: TaskCreate):
+        title = payload.title.strip()
         if not title:
-            return jsonify(error="title is required"), 400
-        task = store.add_task(title)
-        return jsonify(task), 201
+            raise HTTPException(status_code=400, detail="title is required")
+        return store.add_task(title)
 
-    @app.get("/tasks")
+    @app.get("/tasks", response_model=list[Task])
     def list_tasks():
-        return jsonify(store.list_tasks()), 200
+        return store.list_tasks()
+
+    @app.patch("/tasks/{task_id}", response_model=Task)
+    def update_task(task_id: int, payload: TaskUpdate):
+        title = payload.title
+        if title is not None:
+            title = title.strip()
+            if not title:
+                raise HTTPException(status_code=400, detail="title must not be empty")
+        updated = store.update_task(task_id, title=title, status=payload.status)
+        if updated is None:
+            raise HTTPException(status_code=404, detail="task not found")
+        return updated
+
+    @app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+    def delete_task(task_id: int):
+        if not store.delete_task(task_id):
+            raise HTTPException(status_code=404, detail="task not found")
+        return None
 
     @app.get("/metrics")
     def get_metrics():
-        return jsonify(metrics.snapshot(store.count())), 200
-
-    @app.patch("/tasks/<int:task_id>")
-    def update_task(task_id):
-        body = request.get_json(silent=True) or {}
-        title = body.get("title")
-        status = body.get("status")
-        if title is not None:
-            title = str(title).strip()
-            if not title:
-                return jsonify(error="title must not be empty"), 400
-        updated = store.update_task(task_id, title=title, status=status)
-        if updated is None:
-            return jsonify(error="task not found"), 404
-        return jsonify(updated), 200
-
-    @app.delete("/tasks/<int:task_id>")
-    def delete_task(task_id):
-        if not store.delete_task(task_id):
-            return jsonify(error="task not found"), 404
-        return "", 204
+        return metrics.snapshot(store.count())
 
     return app

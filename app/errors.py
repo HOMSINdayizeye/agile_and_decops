@@ -1,24 +1,32 @@
-"""Global error handling and error tracking.
+"""Global exception handlers and error tracking (FastAPI).
 
-Registers handlers that turn exceptions into tracked, structured 500 responses
-so failures are never silent (Sprint 1 retro item #2).
+Maps HTTP exceptions to a consistent `{"error": ...}` JSON shape and turns
+unhandled exceptions into tracked 500 responses so failures are never silent
+(Sprint 1 retro item #2).
 """
+import logging
 import uuid
 
-from flask import Flask, jsonify
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.logging_config import get_logger
 
 
-def register_error_handlers(app: Flask) -> None:
+def register_exception_handlers(app: FastAPI) -> None:
     logger = get_logger()
 
-    @app.errorhandler(404)
-    def not_found(err):
-        return jsonify(error="not found"), 404
+    @app.exception_handler(StarletteHTTPException)
+    async def http_exc_handler(request: Request, exc: StarletteHTTPException):
+        msg = "not found" if exc.status_code == 404 else exc.detail
+        return JSONResponse(status_code=exc.status_code, content={"error": msg})
 
-    @app.errorhandler(500)
-    def internal_error(err):
+    @app.exception_handler(Exception)
+    async def unhandled_exc_handler(request: Request, exc: Exception):
         error_id = uuid.uuid4().hex[:12]
-        logger.error("unhandled error id=%s: %s", error_id, err, exc_info=True)
-        return jsonify(error="internal server error", error_id=error_id), 500
+        logger.error("unhandled error id=%s: %s", error_id, exc, exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={"error": "internal server error", "error_id": error_id},
+        )

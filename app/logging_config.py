@@ -1,11 +1,14 @@
-"""Structured logging configuration.
+"""Structured logging configuration (FastAPI/Starlette).
 
-Provides a single configured logger used across the app and a Flask hook that
-logs every request (method, path, status, duration) — the observability gap
+Provides a single configured logger and a middleware that logs every request
+(method, path, status, duration) and records metrics — the observability gap
 called out in the Sprint 1 retrospective.
 """
 import logging
 import time
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 from app import metrics
 
@@ -33,24 +36,15 @@ def get_logger() -> logging.Logger:
     return logging.getLogger(LOGGER_NAME)
 
 
-def request_logging_middleware(app) -> None:
-    """Log method, path, status and duration for every request."""
-
-    @app.before_request
-    def _start_timer():
-        from flask import g
-
-        g._start = time.perf_counter()
-
-    @app.after_request
-    def _log_request(response):
-        from flask import g, request
-
-        duration_ms = (time.perf_counter() - getattr(g, "_start", time.perf_counter())) * 1000
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start = time.perf_counter()
+        response = await call_next(request)
+        duration_ms = (time.perf_counter() - start) * 1000
         get_logger().info(
             "request %s %s -> %s (%.1f ms)",
             request.method,
-            request.path,
+            request.url.path,
             response.status_code,
             duration_ms,
         )
