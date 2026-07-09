@@ -30,7 +30,12 @@ def test_internal_error_is_tracked_with_error_id(client, caplog):
         ("unhandled error id=" + body["error_id"]) in r.message
         for r in caplog.records
     )
-
+    # Confirm the error_id is a valid hex string.
+def test_request_is_logged(client, caplog):
+    logging.getLogger("taskflow").propagate = True
+    caplog.set_level(logging.INFO, logger="taskflow")
+    client.get("/health")
+    assert any("request GET /health" in r.message for r in caplog.records)
 
 def test_request_is_logged(client, caplog):
     logging.getLogger("taskflow").propagate = True
