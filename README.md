@@ -8,7 +8,7 @@ deleting tasks, plus health, metrics, structured logging, and error tracking.
 
 ```bash
 python -m pip install -r requirements.txt
-python -m app
+python -m app   #running
 ```
 
 The server starts on **http://127.0.0.1:5000** (this is the address to open).
